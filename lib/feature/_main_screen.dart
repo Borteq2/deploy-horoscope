@@ -76,9 +76,7 @@ class _MainScreenState extends State<MainScreen> {
     String mySign = mapSighToSignName(sign);
     final response =
         await GetIt.I<Dio>().get('https://deployhoroscope.ru/api/v1/day');
-    talker.info(response.data['result']['signs']
-        .firstWhere((e) => e['id'] == mySign)
-    );
+    await Future.delayed(const Duration(seconds: 1));
     return response.data['result']['signs']
         .firstWhere((e) => e['id'] == mySign);
   }
@@ -222,30 +220,50 @@ class _MainScreenState extends State<MainScreen> {
               ),
             ),
             comment.isEmpty
-                ? const Padding(
-                    padding: EdgeInsets.only(bottom: 32),
-                    child: Text(
-                      'Нажмите на шар,\nчтобы узнать судьбу своего деплоя',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontWeight: FontWeight.w400,
-                        fontSize: 16,
-                        fontFamily: 'Gill_Sans',
-                        color: Color(0xFF727272),
-                      ),
+                ? Padding(
+                    padding: const EdgeInsets.only(bottom: 32),
+                    child: Column(
+                      children: [
+                        IconButton(
+                            onPressed: () {},
+                            color: Colors.transparent,
+                            icon: const Icon(Icons.refresh)),
+                        const Text(
+                          'Нажмите на шар,\nчтобы узнать судьбу своего деплоя',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontWeight: FontWeight.w400,
+                            fontSize: 16,
+                            fontFamily: 'Gill_Sans',
+                            color: Color(0xFF727272),
+                          ),
+                        ),
+                      ],
                     ),
                   )
                 : Padding(
                     padding: const EdgeInsets.only(bottom: 32),
-                    child: Text(
-                      comment,
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.w400,
-                        fontSize: 16,
-                        fontFamily: 'Gill_Sans',
-                        color: Color(0xFF727272),
-                      ),
+                    child: Column(
+                      children: [
+                        IconButton(
+                            onPressed: () => setState(() {
+                                  waitingResponse = false;
+                                  status = '';
+                                  comment = '';
+                                  responseText = '';
+                                }),
+                            icon: const Icon(Icons.refresh)),
+                        Text(
+                          comment,
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.w400,
+                            fontSize: 16,
+                            fontFamily: 'Gill_Sans',
+                            color: Color(0xFF727272),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
           ],
