@@ -39,7 +39,6 @@ class _MainScreenState extends State<MainScreen> {
   String comment = '';
   String html = '';
 
-  // TODO: хардкод
   Sign? sign;
   Talker talker = GetIt.I<Talker>();
 
@@ -243,11 +242,9 @@ class _MainScreenState extends State<MainScreen> {
   String getStatusFromData(Map<String, dynamic> data) {
     return data['status'];
   }
-
   String getCommentFromData(Map<String, dynamic> data) {
     return data['comment'];
   }
-
   String getHtmlFromData(Map<String, dynamic> data) {
     return data['html'];
   }
@@ -284,15 +281,7 @@ class _MainScreenState extends State<MainScreen> {
                         setState(() {
                           waitingResponse = true;
                           status = 'pending';
-                          responseText = status == 'good'
-                              ? allow
-                              : status == 'bad'
-                                  ? bad
-                                  : status == 'neutral'
-                                      ? doubt
-                                      : status == 'pending'
-                                          ? loading
-                                          : error;
+                          setTextByStatus();
                         });
                         try {
                           Map<String, dynamic> signData =
@@ -301,15 +290,7 @@ class _MainScreenState extends State<MainScreen> {
                             status = signData['status'];
                             comment = signData['comment'];
                             html = signData['html'];
-                            responseText = status == 'good'
-                                ? allow
-                                : status == 'bad'
-                                    ? bad
-                                    : status == 'neutral'
-                                        ? doubt
-                                        : status == 'pending'
-                                            ? loading
-                                            : error;
+                            setTextByStatus();
                           });
                         } catch (e, st) {
                           talker.handle(e, st);
@@ -318,91 +299,17 @@ class _MainScreenState extends State<MainScreen> {
                         }
                       } else {}
                     },
-                    child: Stack(
-                      alignment: Alignment.center,
-                      children: [
-                        Image.asset('assets/images/ball.png'),
-                        AnimatedOpacity(
-                          duration: const Duration(milliseconds: 600),
-                          opacity: waitingResponse ? 0.0 : 1.0,
-                          child: Image.asset('assets/images/small_star.png'),
-                        ),
-                        AnimatedOpacity(
-                          duration: const Duration(milliseconds: 600),
-                          opacity: waitingResponse ? 0.0 : 1.0,
-                          child: Image.asset('assets/images/star.png'),
-                        ),
-                        AnimatedOpacity(
-                          duration: const Duration(milliseconds: 400),
-                          opacity: waitingResponse ? 1.0 : 0.0,
-                          child: Image.asset('assets/images/black_ball.png'),
-                        ),
-                        AnimatedOpacity(
-                          duration: const Duration(milliseconds: 400),
-                          opacity: responseText.isNotEmpty ? 1.0 : 0.0,
-                          child: SizedBox(
-                            width: 300,
-                            child: Text(
-                              responseText,
-                              textAlign: TextAlign.center,
-                              softWrap: true,
-                              maxLines: 2,
-                              style: TextStyle(
-                                fontWeight: FontWeight.w400,
-                                fontSize: 32,
-                                fontFamily: 'SaarFont',
-                                color: responseText == allow
-                                    ? Colors.green
-                                    : responseText == bad
-                                        ? Colors.red
-                                        : responseText == doubt
-                                            ? Colors.yellow
-                                            : responseText == error
-                                                ? Colors.grey
-                                                : Colors.white,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
+                    child: BallWidget(
+                        waitingResponse: waitingResponse,
+                        responseText: responseText),
                   ),
-                  Align(
-                    alignment: Alignment.center,
-                    child: Stack(
-                      alignment: Alignment.center,
-                      children: [
-                        Image.asset('assets/images/big_ellipse.png'),
-                        Image.asset('assets/images/small_ellipse.png'),
-                      ],
-                    ),
-                  ),
+                  const EllipsisesWidget(),
                 ],
               ),
             ),
             sign != null
                 ? comment.isEmpty
-                    ? Padding(
-                        padding: const EdgeInsets.only(bottom: 32),
-                        child: Column(
-                          children: [
-                            IconButton(
-                                onPressed: () {},
-                                color: Colors.transparent,
-                                icon: const Icon(Icons.refresh)),
-                            const Text(
-                              'Нажмите на шар,\nчтобы узнать судьбу своего деплоя',
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                fontWeight: FontWeight.w400,
-                                fontSize: 16,
-                                fontFamily: 'Gill_Sans',
-                                color: Color(0xFF727272),
-                              ),
-                            ),
-                          ],
-                        ),
-                      )
+                    ? PredictHintWidget()
                     : Padding(
                         padding: const EdgeInsets.only(bottom: 32),
                         child: Column(
@@ -480,6 +387,132 @@ class _MainScreenState extends State<MainScreen> {
           ],
         ),
       ),
+    );
+  }
+
+  void setTextByStatus() {
+    responseText = status == 'good'
+        ? allow
+        : status == 'bad'
+            ? bad
+            : status == 'neutral'
+                ? doubt
+                : status == 'pending'
+                    ? loading
+                    : error;
+  }
+}
+
+class PredictHintWidget extends StatelessWidget {
+  const PredictHintWidget({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+        padding: const EdgeInsets.only(bottom: 32),
+        child: Column(
+          children: [
+            IconButton(
+                onPressed: () {},
+                color: Colors.transparent,
+                icon: const Icon(Icons.refresh)),
+            const Text(
+              'Нажмите на шар,\nчтобы узнать судьбу своего деплоя',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontWeight: FontWeight.w400,
+                fontSize: 16,
+                fontFamily: 'Gill_Sans',
+                color: Color(0xFF727272),
+              ),
+            ),
+          ],
+        ),
+      );
+  }
+}
+
+class EllipsisesWidget extends StatelessWidget {
+  const EllipsisesWidget({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Align(
+      alignment: Alignment.center,
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          Image.asset('assets/images/big_ellipse.png'),
+          Image.asset('assets/images/small_ellipse.png'),
+        ],
+      ),
+    );
+  }
+}
+
+class BallWidget extends StatelessWidget {
+  const BallWidget({
+    super.key,
+    required this.waitingResponse,
+    required this.responseText,
+  });
+
+  final bool waitingResponse;
+  final String responseText;
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      alignment: Alignment.center,
+      children: [
+        Image.asset('assets/images/ball.png'),
+        AnimatedOpacity(
+          duration: const Duration(milliseconds: 600),
+          opacity: waitingResponse ? 0.0 : 1.0,
+          child: Image.asset('assets/images/small_star.png'),
+        ),
+        AnimatedOpacity(
+          duration: const Duration(milliseconds: 600),
+          opacity: waitingResponse ? 0.0 : 1.0,
+          child: Image.asset('assets/images/star.png'),
+        ),
+        AnimatedOpacity(
+          duration: const Duration(milliseconds: 400),
+          opacity: waitingResponse ? 1.0 : 0.0,
+          child: Image.asset('assets/images/black_ball.png'),
+        ),
+        AnimatedOpacity(
+          duration: const Duration(milliseconds: 400),
+          opacity: responseText.isNotEmpty ? 1.0 : 0.0,
+          child: SizedBox(
+            width: 300,
+            child: Text(
+              responseText,
+              textAlign: TextAlign.center,
+              softWrap: true,
+              maxLines: 2,
+              style: TextStyle(
+                fontWeight: FontWeight.w400,
+                fontSize: 32,
+                fontFamily: 'SaarFont',
+                color: responseText == allow
+                    ? Colors.green
+                    : responseText == bad
+                        ? Colors.red
+                        : responseText == doubt
+                            ? Colors.yellow
+                            : responseText == error
+                                ? Colors.grey
+                                : Colors.white,
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 }
