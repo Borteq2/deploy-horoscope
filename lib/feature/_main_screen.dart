@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:talker_flutter/talker_flutter.dart';
 
 enum Sign {
@@ -239,18 +240,37 @@ class _MainScreenState extends State<MainScreen> {
         .firstWhere((e) => e['id'] == mySign);
   }
 
+  Future<void> saveSignIndexToSP(Sign sign) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setInt('sign', Sign.values.indexOf(sign));
+  }
+
+  Future<void> getSignFromSP() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    int? savedIndex = prefs.getInt('sign');
+    if (savedIndex != null) {
+      sign = Sign.values[savedIndex];
+      talker.info(sign);
+    } else {
+      talker.warning('SP не отдал данных');
+    }
+  }
+
   String getStatusFromData(Map<String, dynamic> data) {
     return data['status'];
   }
+
   String getCommentFromData(Map<String, dynamic> data) {
     return data['comment'];
   }
+
   String getHtmlFromData(Map<String, dynamic> data) {
     return data['html'];
   }
 
   @override
   void initState() {
+    getSignFromSP();
     super.initState();
   }
 
@@ -359,6 +379,7 @@ class _MainScreenState extends State<MainScreen> {
                                       itemBuilder: (context, index) => InkWell(
                                         onTap: () => setState(() {
                                           sign = Sign.values[index];
+                                          saveSignIndexToSP(Sign.values[index]);
                                           Navigator.of(context).pop();
                                         }),
                                         child: signs[index],
@@ -411,26 +432,26 @@ class PredictHintWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-        padding: const EdgeInsets.only(bottom: 32),
-        child: Column(
-          children: [
-            IconButton(
-                onPressed: () {},
-                color: Colors.transparent,
-                icon: const Icon(Icons.refresh)),
-            const Text(
-              'Нажмите на шар,\nчтобы узнать судьбу своего деплоя',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontWeight: FontWeight.w400,
-                fontSize: 16,
-                fontFamily: 'Gill_Sans',
-                color: Color(0xFF727272),
-              ),
+      padding: const EdgeInsets.only(bottom: 32),
+      child: Column(
+        children: [
+          IconButton(
+              onPressed: () {},
+              color: Colors.transparent,
+              icon: const Icon(Icons.refresh)),
+          const Text(
+            'Нажмите на шар,\nчтобы узнать судьбу своего деплоя',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontWeight: FontWeight.w400,
+              fontSize: 16,
+              fontFamily: 'Gill_Sans',
+              color: Color(0xFF727272),
             ),
-          ],
-        ),
-      );
+          ),
+        ],
+      ),
+    );
   }
 }
 
