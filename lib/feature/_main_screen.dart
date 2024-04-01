@@ -40,6 +40,8 @@ class _MainScreenState extends State<MainScreen> {
   String comment = '';
   String html = '';
 
+  bool isFullyLoaded = false;
+
   Sign? sign;
   Talker talker = GetIt.I<Talker>();
 
@@ -254,6 +256,9 @@ class _MainScreenState extends State<MainScreen> {
     } else {
       talker.warning('SP не отдал данных');
     }
+    setState(() {
+      isFullyLoaded = true;
+    });
   }
 
   String getStatusFromData(Map<String, dynamic> data) {
@@ -327,25 +332,78 @@ class _MainScreenState extends State<MainScreen> {
                 ],
               ),
             ),
-            sign != null
-                ? comment.isEmpty
-                    ? PredictHintWidget()
+            isFullyLoaded
+                ? sign != null
+                    ? comment.isEmpty
+                        ? const PredictHintWidget()
+                        : Padding(
+                            padding: const EdgeInsets.only(bottom: 32),
+                            child: Column(
+                              children: [
+                                IconButton(
+                                    onPressed: () => setState(() {
+                                          waitingResponse = false;
+                                          status = '';
+                                          comment = '';
+                                          responseText = '';
+                                        }),
+                                    icon: const Icon(Icons.refresh)),
+                                Text(
+                                  comment,
+                                  textAlign: TextAlign.center,
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.w400,
+                                    fontSize: 16,
+                                    fontFamily: 'Gill_Sans',
+                                    color: Color(0xFF727272),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          )
                     : Padding(
                         padding: const EdgeInsets.only(bottom: 32),
                         child: Column(
                           children: [
                             IconButton(
-                                onPressed: () => setState(() {
-                                      waitingResponse = false;
-                                      status = '';
-                                      comment = '';
-                                      responseText = '';
-                                    }),
-                                icon: const Icon(Icons.refresh)),
-                            Text(
-                              comment,
+                              onPressed: () {
+                                showModalBottomSheet(
+                                  context: context,
+                                  backgroundColor: Colors.transparent,
+                                  isScrollControlled: true,
+                                  builder: (BuildContext context) {
+                                    return Padding(
+                                      padding: const EdgeInsets.all(16.0),
+                                      child: ClipRRect(
+                                        borderRadius: BorderRadius.circular(20),
+                                        child: GridView.builder(
+                                          gridDelegate:
+                                              const SliverGridDelegateWithFixedCrossAxisCount(
+                                                  crossAxisCount: 3),
+                                          shrinkWrap: true,
+                                          itemCount: signs.length,
+                                          itemBuilder: (context, index) =>
+                                              InkWell(
+                                            onTap: () => setState(() {
+                                              sign = Sign.values[index];
+                                              saveSignIndexToSP(
+                                                  Sign.values[index]);
+                                              Navigator.of(context).pop();
+                                            }),
+                                            child: signs[index],
+                                          ),
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                );
+                              },
+                              icon: const Icon(Icons.blur_circular),
+                            ),
+                            const Text(
+                              'Выберите свой\nзнак зодиака',
                               textAlign: TextAlign.center,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontWeight: FontWeight.w400,
                                 fontSize: 16,
                                 fontFamily: 'Gill_Sans',
@@ -360,40 +418,11 @@ class _MainScreenState extends State<MainScreen> {
                     child: Column(
                       children: [
                         IconButton(
-                          onPressed: () {
-                            showModalBottomSheet(
-                              context: context,
-                              backgroundColor: Colors.transparent,
-                              isScrollControlled: true,
-                              builder: (BuildContext context) {
-                                return Padding(
-                                  padding: const EdgeInsets.all(16.0),
-                                  child: ClipRRect(
-                                    borderRadius: BorderRadius.circular(20),
-                                    child: GridView.builder(
-                                      gridDelegate:
-                                          const SliverGridDelegateWithFixedCrossAxisCount(
-                                              crossAxisCount: 3),
-                                      shrinkWrap: true,
-                                      itemCount: signs.length,
-                                      itemBuilder: (context, index) => InkWell(
-                                        onTap: () => setState(() {
-                                          sign = Sign.values[index];
-                                          saveSignIndexToSP(Sign.values[index]);
-                                          Navigator.of(context).pop();
-                                        }),
-                                        child: signs[index],
-                                      ),
-                                    ),
-                                  ),
-                                );
-                              },
-                            );
-                          },
-                          icon: const Icon(Icons.select_all),
-                        ),
+                            onPressed: () {},
+                            color: Colors.transparent,
+                            icon: const Icon(Icons.anchor)),
                         const Text(
-                          'Выберите свой\nзнак зодиака',
+                          '',
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             fontWeight: FontWeight.w400,
