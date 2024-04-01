@@ -40,8 +40,167 @@ class _MainScreenState extends State<MainScreen> {
   String html = '';
 
   // TODO: хардкод
-  Sign sign = Sign.taurus;
+  Sign? sign;
   Talker talker = GetIt.I<Talker>();
+
+  List<Widget> signs = [
+    Card(
+        color: const Color(0xFF100C2C).withOpacity(0.7),
+        child: const Stack(
+          children: [
+            Align(
+              alignment: Alignment.center,
+              child: Text('♈', style: TextStyle(fontSize: 64)),
+            ),
+            Align(
+                alignment: Alignment.bottomCenter,
+                child: Text('Овен', style: TextStyle(fontSize: 20))),
+          ],
+        )),
+    Card(
+        color: const Color(0xFF100C2C).withOpacity(0.7),
+        child: const Stack(
+          children: [
+            Align(
+              alignment: Alignment.center,
+              child: Text('♉', style: TextStyle(fontSize: 64)),
+            ),
+            Align(
+                alignment: Alignment.bottomCenter,
+                child: Text('Телец', style: TextStyle(fontSize: 20))),
+          ],
+        )),
+    Card(
+        color: const Color(0xFF100C2C).withOpacity(0.7),
+        child: const Stack(
+          children: [
+            Align(
+              alignment: Alignment.center,
+              child: Text('♊', style: TextStyle(fontSize: 64)),
+            ),
+            Align(
+                alignment: Alignment.bottomCenter,
+                child: Text('Близнецы', style: TextStyle(fontSize: 20))),
+          ],
+        )),
+    Card(
+        color: const Color(0xFF100C2C).withOpacity(0.7),
+        child: const Stack(
+          children: [
+            Align(
+              alignment: Alignment.center,
+              child: Text('♋', style: TextStyle(fontSize: 64)),
+            ),
+            Align(
+                alignment: Alignment.bottomCenter,
+                child: Text('Рак', style: TextStyle(fontSize: 20))),
+          ],
+        )),
+    Card(
+        color: const Color(0xFF100C2C).withOpacity(0.7),
+        child: const Stack(
+          children: [
+            Align(
+              alignment: Alignment.center,
+              child: Text('♌', style: TextStyle(fontSize: 64)),
+            ),
+            Align(
+                alignment: Alignment.bottomCenter,
+                child: Text('Лев', style: TextStyle(fontSize: 20))),
+          ],
+        )),
+    Card(
+        color: const Color(0xFF100C2C).withOpacity(0.7),
+        child: const Stack(
+          children: [
+            Align(
+              alignment: Alignment.center,
+              child: Text('♍', style: TextStyle(fontSize: 64)),
+            ),
+            Align(
+                alignment: Alignment.bottomCenter,
+                child: Text('Дева', style: TextStyle(fontSize: 20))),
+          ],
+        )),
+    Card(
+        color: const Color(0xFF100C2C).withOpacity(0.7),
+        child: const Stack(
+          children: [
+            Align(
+              alignment: Alignment.center,
+              child: Text('♎', style: TextStyle(fontSize: 64)),
+            ),
+            Align(
+                alignment: Alignment.bottomCenter,
+                child: Text('Весы', style: TextStyle(fontSize: 20))),
+          ],
+        )),
+    Card(
+        color: const Color(0xFF100C2C).withOpacity(0.7),
+        child: const Stack(
+          children: [
+            Align(
+              alignment: Alignment.center,
+              child: Text('♏', style: TextStyle(fontSize: 64)),
+            ),
+            Align(
+                alignment: Alignment.bottomCenter,
+                child: Text('Скорпион', style: TextStyle(fontSize: 20))),
+          ],
+        )),
+    Card(
+        color: const Color(0xFF100C2C).withOpacity(0.7),
+        child: const Stack(
+          children: [
+            Align(
+              alignment: Alignment.center,
+              child: Text('♐', style: TextStyle(fontSize: 64)),
+            ),
+            Align(
+                alignment: Alignment.bottomCenter,
+                child: Text('Стрелец', style: TextStyle(fontSize: 20))),
+          ],
+        )),
+    Card(
+        color: const Color(0xFF100C2C).withOpacity(0.7),
+        child: const Stack(
+          children: [
+            Align(
+              alignment: Alignment.center,
+              child: Text('♑', style: TextStyle(fontSize: 64)),
+            ),
+            Align(
+                alignment: Alignment.bottomCenter,
+                child: Text('Козерог', style: TextStyle(fontSize: 20))),
+          ],
+        )),
+    Card(
+        color: const Color(0xFF100C2C).withOpacity(0.7),
+        child: const Stack(
+          children: [
+            Align(
+              alignment: Alignment.center,
+              child: Text('♒', style: TextStyle(fontSize: 64)),
+            ),
+            Align(
+                alignment: Alignment.bottomCenter,
+                child: Text('Водолей', style: TextStyle(fontSize: 20))),
+          ],
+        )),
+    Card(
+        color: const Color(0xFF100C2C).withOpacity(0.7),
+        child: const Stack(
+          children: [
+            Align(
+              alignment: Alignment.center,
+              child: Text('♓', style: TextStyle(fontSize: 64)),
+            ),
+            Align(
+                alignment: Alignment.bottomCenter,
+                child: Text('Рыбы', style: TextStyle(fontSize: 20))),
+          ],
+        )),
+  ];
 
   String mapSighToSignName(Sign sign) {
     switch (sign) {
@@ -121,26 +280,10 @@ class _MainScreenState extends State<MainScreen> {
                 children: [
                   GestureDetector(
                     onTap: () async {
-                      setState(() {
-                        waitingResponse = true;
-                        status = 'pending';
-                        responseText = status == 'good'
-                            ? allow
-                            : status == 'bad'
-                                ? bad
-                                : status == 'neutral'
-                                    ? doubt
-                                    : status == 'pending'
-                                        ? loading
-                                        : error;
-                      });
-                      try {
-                        Map<String, dynamic> signData =
-                            await loadDaySignData(sign);
+                      if (sign != null) {
                         setState(() {
-                          status = signData['status'];
-                          comment = signData['comment'];
-                          html = signData['html'];
+                          waitingResponse = true;
+                          status = 'pending';
                           responseText = status == 'good'
                               ? allow
                               : status == 'bad'
@@ -151,11 +294,29 @@ class _MainScreenState extends State<MainScreen> {
                                           ? loading
                                           : error;
                         });
-                      } catch (e, st) {
-                        talker.handle(e, st);
-                        responseText = error;
-                        comment = '(На самом деле что-то сломалось)';
-                      }
+                        try {
+                          Map<String, dynamic> signData =
+                              await loadDaySignData(sign!);
+                          setState(() {
+                            status = signData['status'];
+                            comment = signData['comment'];
+                            html = signData['html'];
+                            responseText = status == 'good'
+                                ? allow
+                                : status == 'bad'
+                                    ? bad
+                                    : status == 'neutral'
+                                        ? doubt
+                                        : status == 'pending'
+                                            ? loading
+                                            : error;
+                          });
+                        } catch (e, st) {
+                          talker.handle(e, st);
+                          responseText = error;
+                          comment = '(На самом деле что-то сломалось)';
+                        }
+                      } else {}
                     },
                     child: Stack(
                       alignment: Alignment.center,
@@ -219,44 +380,94 @@ class _MainScreenState extends State<MainScreen> {
                 ],
               ),
             ),
-            comment.isEmpty
-                ? Padding(
-                    padding: const EdgeInsets.only(bottom: 32),
-                    child: Column(
-                      children: [
-                        IconButton(
-                            onPressed: () {},
-                            color: Colors.transparent,
-                            icon: const Icon(Icons.refresh)),
-                        const Text(
-                          'Нажмите на шар,\nчтобы узнать судьбу своего деплоя',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            fontWeight: FontWeight.w400,
-                            fontSize: 16,
-                            fontFamily: 'Gill_Sans',
-                            color: Color(0xFF727272),
-                          ),
+            sign != null
+                ? comment.isEmpty
+                    ? Padding(
+                        padding: const EdgeInsets.only(bottom: 32),
+                        child: Column(
+                          children: [
+                            IconButton(
+                                onPressed: () {},
+                                color: Colors.transparent,
+                                icon: const Icon(Icons.refresh)),
+                            const Text(
+                              'Нажмите на шар,\nчтобы узнать судьбу своего деплоя',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontWeight: FontWeight.w400,
+                                fontSize: 16,
+                                fontFamily: 'Gill_Sans',
+                                color: Color(0xFF727272),
+                              ),
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
-                  )
+                      )
+                    : Padding(
+                        padding: const EdgeInsets.only(bottom: 32),
+                        child: Column(
+                          children: [
+                            IconButton(
+                                onPressed: () => setState(() {
+                                      waitingResponse = false;
+                                      status = '';
+                                      comment = '';
+                                      responseText = '';
+                                    }),
+                                icon: const Icon(Icons.refresh)),
+                            Text(
+                              comment,
+                              textAlign: TextAlign.center,
+                              style: const TextStyle(
+                                fontWeight: FontWeight.w400,
+                                fontSize: 16,
+                                fontFamily: 'Gill_Sans',
+                                color: Color(0xFF727272),
+                              ),
+                            ),
+                          ],
+                        ),
+                      )
                 : Padding(
                     padding: const EdgeInsets.only(bottom: 32),
                     child: Column(
                       children: [
                         IconButton(
-                            onPressed: () => setState(() {
-                                  waitingResponse = false;
-                                  status = '';
-                                  comment = '';
-                                  responseText = '';
-                                }),
-                            icon: const Icon(Icons.refresh)),
-                        Text(
-                          comment,
+                          onPressed: () {
+                            showModalBottomSheet(
+                              context: context,
+                              backgroundColor: Colors.transparent,
+                              isScrollControlled: true,
+                              builder: (BuildContext context) {
+                                return Padding(
+                                  padding: const EdgeInsets.all(16.0),
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(20),
+                                    child: GridView.builder(
+                                      gridDelegate:
+                                          const SliverGridDelegateWithFixedCrossAxisCount(
+                                              crossAxisCount: 3),
+                                      shrinkWrap: true,
+                                      itemCount: signs.length,
+                                      itemBuilder: (context, index) => InkWell(
+                                        onTap: () => setState(() {
+                                          sign = Sign.values[index];
+                                          Navigator.of(context).pop();
+                                        }),
+                                        child: signs[index],
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              },
+                            );
+                          },
+                          icon: const Icon(Icons.select_all),
+                        ),
+                        const Text(
+                          'Выберите свой\nзнак зодиака',
                           textAlign: TextAlign.center,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontWeight: FontWeight.w400,
                             fontSize: 16,
                             fontFamily: 'Gill_Sans',
