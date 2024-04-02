@@ -1,4 +1,6 @@
 # deploy_horoscope
 
-Unofficial app for https://deployhoroscope.ru/
+Неофициальное приложение для API https://deployhoroscope.ru/
 
+- Очень уродливое, состряпано за 1 вечер
+- Ни архитектуры, ни модульности, ни красоты, просто работает и всё
